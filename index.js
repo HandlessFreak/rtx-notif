@@ -26,28 +26,6 @@ const notify = (webpage) => {
 }
 
 /**
- * Add a new user to the list of users to be notified
- * @param author - User to be added to list of people to be notified
- * @returns True if user is not already on the list
- */
-const addMember = (author) => {
-    if (members.some(member => member.toString() == author.toString())) return false;
-    members.push(author);
-    return true;
-}
-
-/**
- * Remove the specified user of the list of people to be notified
- * @param author User to be removed
- * @returns True if removed, false if not on list
- */
-const removeMember = (author) => {
-    if (!members.some(member => member.toString() == author.toString())) return false;
-    members.splice(members.indexOf(author), 1);
-    return true;
-}
-
-/**
  * Sleep function to sleep for a specified amount of time.
  * @param {int} milliseconds - How long to sleep for
  * @returns - Promise to sleep for the specified amount of time
@@ -94,25 +72,6 @@ const run = async () => {
 async function main(credentials) {
     // initiate connection to the Mongo database
     await connectToDB(credentials.mongoURL);
-
-    // await Website.create({
-    //     url: "this-is-my-url-2",
-    //     users: [
-    //         "uid1",
-    //         "uid2"
-    //     ]
-    // }, err => {
-    //     if (err) return console.error("Unable to add to database: ", err);
-    //     console.log('Successfully added to database!');
-    // });
-
-    await Website.find({"users": "uid1"}, (err, results) => {
-        if (err) return console.error("Error finding entry: ", err);
-        console.log(results);
-    });
-
-    await commands.addPage(client, "c", "this-is-my-url");
-
     // initialize all events to be handled by Discord.JS
     await initDiscordEvents(credentials.token)
     // start checking websites
@@ -138,7 +97,6 @@ const initDiscordEvents = async (token) => {
 
     /**
      * Handles a new message in an included server the bot is already in
-     * TODO: create a file to store a function for each command
      */
     client.on('message', message => {
         // if the message is not a command or is sent by a bot, ignore the message

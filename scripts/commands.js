@@ -16,6 +16,9 @@ module.exports.handleCommand = async (message) => {
         case 'rtxhelp':
             rtxHelp(message);
             break;
+        case "info":
+            info(message);
+            break;
         default:
             if (command.startsWith('addpage'))
                 await addPage(message, command.slice(8).trim());
@@ -26,8 +29,16 @@ module.exports.handleCommand = async (message) => {
 }
 
 /**
+ * Prints info about the bot for the user, such as the GitHub and donations.
+ * TODO: implement info command
+ * @param {Discord.Message} message - Message containing the command
+ */
+const info = message => {
+}
+
+/**
  * Prints a list of commands for the user
- * @param {Discord.Message} message
+ * @param {Discord.Message} message - Message containing the command
  */
 const rtxHelp = message => {
     message.channel.send("===Commands==="
@@ -49,6 +60,8 @@ const myPages = async (message) => {
             message.channel.send(message.author.toString() + " I had some trouble finding which pages I am watching for you. Either something went wrong on my end, or I am not watching any pages for you right now.");
             return console.error("Error finding user's entries", err);
         }
+        if (!results)
+            return message.channel.send(message.author.toString() + " I am not currently watching any products for you.");
         // add each url to an output string
         let output = message.author.toString() + " These are the pages I am currently watching for you:";
         let i = 1;
@@ -72,15 +85,36 @@ const addPage = async (message, url) => {
             await message.channel.send(message.author.toString() + " Something went wrong on my end! If the issue persists, let my creator know.");
             return console.error("Error retrieving url " + url + " from DB: ", err);
         }
-        // if the user is already watching the URL, return null
-        if (res.users.some(uid => uid === message.author.id))
-            url = null
-        else {
-            // add user ID to the res
-            res.users.push(message.author.id);
-            // update database entry
-            await Website.findByIdAndUpdate(res._id, res, err => {
-                if (err) return console.error("Updating user in db: ", err);
+        // if the url is already in the db
+        if (res) {
+            // if the user is already watching the URL, return null
+            if (res.users.some(uid => uid === message.author.id))
+                url = null
+            else {
+                // add user ID to the res
+                res.users.push(message.author.id);
+                // update database entry
+                await Website.findByIdAndUpdate(res._id, res, err => {
+                    if (err) {
+                        message.channel.send(message.author.toString() + " I had some trouble adding you to the database. If the issue persists, let my creator know.");
+                        return console.error("Updating user in db: ", err);
+                    } else {
+                        message.channel.send(message.author.toString() + " I will let you know when this product comes back in stock!");
+                    }
+                });
+            }
+        } else {
+            // if the url is not already in the db, add it
+            await Website.create({
+                url: url,
+                users: [
+                    message.author.id
+                ]
+            }, err => {
+                if (err) {
+                    message.channel.send(message.author.toString() + " I had some trouble adding this page to my database. If the issue persists, let my creator know.");
+                    return console.error("Error creating new entry in db: ", err);
+                }
             });
         }
     });

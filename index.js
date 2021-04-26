@@ -9,7 +9,8 @@ const Discord = require('discord.js'),
     client = new Discord.Client(),
     fs = require('fs'),
     mongoose = require('mongoose'),
-    Website = require('./models/Website');
+    Website = require('./models/Website'),
+    commands = require('./scripts/commands');
 
 const members = [],
     watchlist = [];
@@ -57,6 +58,7 @@ const sleep = (milliseconds) => {
 
 /**
  * Function to loop and check for a product coming in stock
+ * TODO: store a list of added URLs to be watched, but get list of users from DB when needed
  */
 const run = async () => {
     let found = false;
@@ -92,12 +94,25 @@ const run = async () => {
 async function main(credentials) {
     // initiate connection to the Mongo database
     await connectToDB(credentials.mongoURL);
-    // get all websites to be watched, as well as their respective users
-    const website = await Website.find({}, (err, results) => {
-        if (err) return console.error(err);
-        console.log('Retrieved websites from db');
-        return results;
+
+    // await Website.create({
+    //     url: "this-is-my-url-2",
+    //     users: [
+    //         "uid1",
+    //         "uid2"
+    //     ]
+    // }, err => {
+    //     if (err) return console.error("Unable to add to database: ", err);
+    //     console.log('Successfully added to database!');
+    // });
+
+    await Website.find({"users": "uid1"}, (err, results) => {
+        if (err) return console.error("Error finding entry: ", err);
+        console.log(results);
     });
+
+    await commands.addPage(client, "c", "this-is-my-url");
+
     // initialize all events to be handled by Discord.JS
     await initDiscordEvents(credentials.token)
     // start checking websites

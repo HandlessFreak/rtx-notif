@@ -25,6 +25,19 @@ module.exports.handleCommand = async (message) => {
 }
 
 /**
+ * Prints a list of commands for the user
+ * @param {Discord.Message} message
+ */
+const rtxHelp = message => {
+    message.channel.send("===Commands==="
+        + "\n!RTXhelp -> Display this menu."
+        + "\n!myPages -> Displays a numbered list of the pages I am currently watching for you."
+        + "\n!addPage [url] -> I will notify you when the product at [url] comes in stock."
+        + "\n!removePage [number] -> I will stop watching the specified page for you. [number] corresponds to the URL shown by !myPages."
+        + "\n!info -> Display some information about me and my creator.");
+}
+
+/**
  * Command which returns a list of all pages being currently watched for the given user
  * @param {Discord.Message} message - Message containing the command
  */

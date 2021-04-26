@@ -42,11 +42,11 @@ const info = message => {
  */
 const rtxHelp = async message => {
     await message.channel.send("===Commands==="
-        + "\n!RTXhelp -> Display this menu."
-        + "\n!myPages -> Displays a numbered list of the pages I am currently watching for you."
-        + "\n!addPage [url] -> I will notify you when the product at [url] comes in stock."
-        + "\n!removePage [number] -> I will stop watching the specified page for you. [number] corresponds to the URL shown by !myPages."
-        + "\n!info -> Display some information about me and my creator.");
+        + "\n\n!RTXhelp -> Display this menu."
+        + "\n\n!myPages -> Displays a numbered list of the pages I am currently watching for you."
+        + "\n\n!addPage [url] -> I will notify you when the product at [url] comes in stock."
+        + "\n\n!removePage [number] -> I will stop watching the specified page for you. [number] corresponds to the URL shown by !myPages."
+        + "\n\n!info -> Display some information about me and my creator.");
 }
 
 /**
@@ -60,7 +60,7 @@ const myPages = async (message) => {
             message.channel.send(message.author.toString() + " I had some trouble finding which pages I am watching for you. Either something went wrong on my end, or I am not watching any pages for you right now.");
             return console.error("Error finding user's entries", err);
         }
-        if (!results)
+        if (results.length === 0)
             return message.channel.send(message.author.toString() + " I am not currently watching any products for you.");
         // add each url to an output string
         let output = message.author.toString() + " These are the pages I am currently watching for you:";
@@ -136,6 +136,10 @@ const removePage = async (message, num) => {
             await message.channel.send(message.author.toString() + " I had some trouble finding which pages I am watching for you. Either something went wrong on my end, or I am not watching any pages for you right now.");
             return console.error("Error finding user's entries", err);
         }
+        if (results.length === 0)
+            return message.channel.send(message.author.toString() + " I am not currently watching any pages for you.");
+        if (results.length <= num)
+            return message.channel.send(message.author.toString() + " That is an invalid number.");
         // remove the user from the list for the website
         results[num - 1].users.pop(message.author.id);
         if (results[num - 1].users.length === 0)

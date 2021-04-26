@@ -17,11 +17,12 @@ const members = [],
 
 /**
  * Send a DM to everyone who wants to be notified of the in-stock product
- * @param {String} webpage - URL of website with product that is in stock
+ * @param webpage - URL of website with product that is in stock
  */
-const notify = (webpage) => {
-    members.forEach(member => {
-        member.send('This card is in stock!\n' + webpage);
+const notify = (page) => {
+    page.users.forEach(async uid => {
+        const user = await client.users.fetch(uid);
+        user.send('Your item is in stock!\n\n' + page.url);
     });
 }
 
@@ -40,29 +41,36 @@ const sleep = (milliseconds) => {
  */
 const run = async () => {
     let found = false;
+    let error = false;
     while (true) {
-        // for each URL
-        await watchlist.forEach(url => {
-            // get the HTML
-            axios.get(url)
-                .then((res) => {
-                    // load the HTML into cheerio
-                    const $ = cheerio.load(res.data);
-                    // if 'Add to Cart' button is available, notify all users
-                    if ('Add to Cart' == $('.btn-lg').html()) {
-                        notify(url);
-                        found = true;
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
+        // get a list of all the websites in the db
+        await Website.find({}, (err, pages) => {
+            if (err) {
+                error = true;
+                return console.error("Error retrieving entries from the database. Trying again in 10 minutes.", err);
+            }
+            pages.forEach(page => {
+                axios.get(page.url)
+                    .then(res => {
+                        const $ = cheerio.load(res.data);
+                        if ('Add to Cart' == $('.btn-lg').html()) {
+                            notify(page);
+                            found = true;
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err)
+                    });
+            });
         });
-        // if there has not been a restock, wait 10 seconds before checking again
-        if (!found) {
+        if (error) {
+            error = false;
+            await sleep(600000);
+        } else if (!found) {
+            // if there has not been a restock, wait 10 seconds before checking again
             await sleep(10000);
-            // if there has been a restock wait like 6 hours or something idk
         } else {
+            // if there has been a restock wait like 6 hours or something idk
             found = false;
             await sleep(60000000);
         }

@@ -143,48 +143,7 @@ const initDiscordEvents = async (token) => {
     client.on('message', message => {
         // if the message is not a command or is sent by a bot, ignore the message
         if (!message.content.startsWith('!') || message.author.bot) return;
-        // remove the '!' at the beginning of the command
-        let command = message.content.toLowerCase().slice(1).trim();
-        switch (command) {
-            // TODO: add '!myPages' command to view which websites you are currently being notified of
-            // add message author to list of people to be notified
-            case 'notifyme':
-                if (addMember(message.author)) {
-                    message.channel.send('Successfully added ' + message.author.toString());
-                } else {
-                    message.channel.send('You are already on the notification list.');
-                }
-                break;
-            // TODO: revamp '!removeme' command to `!removepage`
-            // remove message author from list of people to be notified
-            case 'removeme':
-                if (removeMember(message.author)) {
-                    message.channel.send('Successfully removed ' + message.author.toString());
-                } else {
-                    message.channel.send('You are not on the notification list.');
-                }
-                break;
-            // show the help message for a list of commands
-            case 'rtxhelp':
-                message.channel.send('===Commands===\n!RTXhelp -> Show this menu\n!notifyMe -> I will send you a DM when an item is in stock\n!removeMe -> I will not longer send you a DM when an item is in stock\n!addPage -> I will check if the given item is in stock\n\nNOTE: I am only capable of checking Best Buy stock.')
-                break;
-            default:
-                // TODO: revamp '!addpage' command and combine with '!notifyme'
-                // NOTE: remove by URL or by number returned from `!myPages`?
-                // add a new URL to list of pages to watch
-                if (command.startsWith('addpage')) {
-                    const url = message.content.toLowerCase().slice(8).trim();
-                    if (url.length <= 0) {
-                        message.channel.send('Invalid link.');
-                        break;
-                    }
-                    watchlist.push(url);
-                    message.channel.send('Webpage successfully added.');
-                } else {
-                    message.channel.send('Command not recognized.');
-                }
-                break;
-        }
+        commands.handleCommand(message);
     });
 
     client.once('ready', () => {

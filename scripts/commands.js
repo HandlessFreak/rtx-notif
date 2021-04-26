@@ -14,6 +14,7 @@ module.exports.handleCommand = async (message) => {
             await myPages(message);
             break;
         case 'rtxhelp':
+            rtxHelp(message);
             break;
         default:
             if (command.startsWith('addpage'))

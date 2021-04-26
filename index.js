@@ -9,7 +9,7 @@ const Discord = require('discord.js'),
     client = new Discord.Client(),
     fs = require('fs'),
     mongoose = require('mongoose'),
-    Website = require('./models/website');
+    Website = require('./models/Website');
 
 const members = [],
     watchlist = [];
@@ -90,6 +90,22 @@ const run = async () => {
 }
 
 async function main(credentials) {
+    // connect to db
+    console.log('Connecting to db...');
+    await mongoose.connect('mongodb+srv://' + credentials.mongo.username + ':' + credentials.mongo.password + '@yelpcamp-production.ezt6p.mongodb.net/rtxnotify?retryWrites=true&w=majority', {
+        useNewUrlParser: true,
+        useFindAndModify: false,
+        useCreateIndex: true,
+        useUnifiedTopology: true
+    }).then(() => {
+        console.log('Connected to db.');
+    });
+    // get all websites to be watched, as well as their respective users
+    const website = await Website.find({}, (err, results) => {
+        if (err) return console.error(err);
+        console.log('Retrieved websites from db');
+        return results;
+    });
     // login to discord
     await client.login(credentials.token);
 
@@ -102,6 +118,7 @@ async function main(credentials) {
         // remove the '!' at the beginning of the command
         let command = message.content.toLowerCase().slice(1).trim();
         switch (command) {
+            // TODO: add '!myPages' command to view which websites you are currently being notified of
             // add message author to list of people to be notified
             case 'notifyme':
                 if (addMember(message.author)) {
@@ -110,6 +127,7 @@ async function main(credentials) {
                     message.channel.send('You are already on the notification list.');
                 }
                 break;
+            // TODO: revamp '!removeme' command to `!removepage`
             // remove message author from list of people to be notified
             case 'removeme':
                 if (removeMember(message.author)) {
@@ -123,6 +141,8 @@ async function main(credentials) {
                 message.channel.send('===Commands===\n!RTXhelp -> Show this menu\n!notifyMe -> I will send you a DM when an item is in stock\n!removeMe -> I will not longer send you a DM when an item is in stock\n!addPage -> I will check if the given item is in stock\n\nNOTE: I am only capable of checking Best Buy stock.')
                 break;
             default:
+                // TODO: revamp '!addpage' command and combine with '!notifyme'
+                // NOTE: remove by URL or by number returned from `!myPages`?
                 // add a new URL to list of pages to watch
                 if (command.startsWith('addpage')) {
                     const url = message.content.toLowerCase().slice(8).trim();

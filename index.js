@@ -90,9 +90,24 @@ const run = async () => {
 }
 
 async function main(credentials) {
+    // initiate connection to the Mongo database
+    await connectToDB(credentials.mongoURL);
+    // get all websites to be watched, as well as their respective users
+    const website = await Website.find({}, (err, results) => {
+        if (err) return console.error(err);
+        console.log('Retrieved websites from db');
+        return results;
+    });
+    // initialize all events to be handled by Discord.JS
+    await initDiscordEvents(credentials.token)
+    // start checking websites
+    run();
+}
+
+const connectToDB = async (url) => {
     // connect to db
     console.log('Connecting to db...');
-    await mongoose.connect('mongodb+srv://' + credentials.mongo.username + ':' + credentials.mongo.password + '@yelpcamp-production.ezt6p.mongodb.net/rtxnotify?retryWrites=true&w=majority', {
+    await mongoose.connect(url, {
         useNewUrlParser: true,
         useFindAndModify: false,
         useCreateIndex: true,
@@ -100,17 +115,15 @@ async function main(credentials) {
     }).then(() => {
         console.log('Connected to db.');
     });
-    // get all websites to be watched, as well as their respective users
-    const website = await Website.find({}, (err, results) => {
-        if (err) return console.error(err);
-        console.log('Retrieved websites from db');
-        return results;
-    });
+}
+
+const initDiscordEvents = async (token) => {
     // login to discord
-    await client.login(credentials.token);
+    await client.login(token);
 
     /**
      * Handles a new message in an included server the bot is already in
+     * TODO: create a file to store a function for each command
      */
     client.on('message', message => {
         // if the message is not a command or is sent by a bot, ignore the message
@@ -162,9 +175,8 @@ async function main(credentials) {
     client.once('ready', () => {
         console.log('Running...');
     });
-
-    run();
 }
+
 
 // get Discord token from credentials.json and store in credentials object
 fs.readFile('credentials.json', (err, content) => {

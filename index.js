@@ -7,7 +7,8 @@ const Discord = require('discord.js'),
     axios = require('axios'),
     cheerio = require('cheerio'),
     client = new Discord.Client(),
-    fs = require('fs');
+    fs = require('fs'),
+    mongoose = require('mongoose');
 
 const members = [],
     watchlist = [];

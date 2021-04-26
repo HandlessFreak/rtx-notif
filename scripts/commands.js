@@ -14,7 +14,7 @@ module.exports.handleCommand = async (message) => {
             await myPages(message);
             break;
         case 'rtxhelp':
-            rtxHelp(message);
+            await rtxHelp(message);
             break;
         case "info":
             info(message);
@@ -40,8 +40,8 @@ const info = message => {
  * Prints a list of commands for the user
  * @param {Discord.Message} message - Message containing the command
  */
-const rtxHelp = message => {
-    message.channel.send("===Commands==="
+const rtxHelp = async message => {
+    await message.channel.send("===Commands==="
         + "\n!RTXhelp -> Display this menu."
         + "\n!myPages -> Displays a numbered list of the pages I am currently watching for you."
         + "\n!addPage [url] -> I will notify you when the product at [url] comes in stock."

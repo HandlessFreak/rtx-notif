@@ -66,8 +66,6 @@ const run = async () => {
                                     timer: timer
                                 });
                             }
-                        } else {
-                            console.log('no');
                         }
                     })
                     .catch(err => {

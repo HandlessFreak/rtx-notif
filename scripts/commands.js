@@ -105,8 +105,6 @@ const addPage = async (message, url) => {
                     if (err) {
                         message.channel.send(message.author.toString() + " I had some trouble adding you to the database. If the issue persists, let my creator know.");
                         return console.error("Updating user in db: ", err);
-                    } else {
-                        message.channel.send(message.author.toString() + " I will let you know when this product comes back in stock!");
                     }
                 });
             }
@@ -126,7 +124,7 @@ const addPage = async (message, url) => {
         }
     });
     if (url)
-        await message.channel.send(message.author.toString() + " I will let you know when that product comes in stock!");
+        await message.channel.send(message.author.toString() + " I will let you know when that product comes back in stock!");
     else
         await message.channel.send(message.author.toString() + " I am already notifying you when that product comes in stock. Try !myPages to see what else I am watching for you.");
 }

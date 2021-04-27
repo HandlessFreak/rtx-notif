@@ -17,7 +17,7 @@ module.exports.handleCommand = async (message) => {
             await rtxHelp(message);
             break;
         case "info":
-            info(message);
+            await info(message);
             break;
         default:
             if (command.startsWith('addpage'))
@@ -33,7 +33,12 @@ module.exports.handleCommand = async (message) => {
  * TODO: implement info command
  * @param {Discord.Message} message - Message containing the command
  */
-const info = message => {
+const info = async message => {
+    await message.channel.send("I am but a simple Discord bot created by a college kid who wanted to get his hands on a 3070."
+        + " My code is linked in the GitHub repo below if you are interested."
+        + " Additionally, if you want to support my creator, you can buy him a coffee or help him through college."
+        + " Happy RTX hunting!"
+        + "\nHis Venmo: @pb4000\nMy code: https://github.com/HandlessFreak/rtx-notif");
 }
 
 /**

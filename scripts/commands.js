@@ -79,6 +79,8 @@ const myPages = async (message) => {
  * @param {String} url - URL to be added
  */
 const addPage = async (message, url) => {
+    if (url.trim().length === 0)
+        return message.channel.send(message.author.toString() + " That is not a valid URL.");
     await Website.findOne({url: url}, async (err, res) => {
         // if there was an error, handle it
         if (err) {
@@ -136,10 +138,8 @@ const removePage = async (message, num) => {
             await message.channel.send(message.author.toString() + " I had some trouble finding which pages I am watching for you. Either something went wrong on my end, or I am not watching any pages for you right now.");
             return console.error("Error finding user's entries", err);
         }
-        if (results.length === 0)
-            return message.channel.send(message.author.toString() + " I am not currently watching any pages for you.");
-        if (results.length <= num)
-            return message.channel.send(message.author.toString() + " That is an invalid number.");
+        if (!results[num - 1])
+            return message.channel.send(message.author.toString() + " Either I am not currently watching any pages for you or this is an invalid number.");
         // remove the user from the list for the website
         results[num - 1].users.pop(message.author.id);
         if (results[num - 1].users.length === 0)

@@ -37,25 +37,37 @@ const sleep = (milliseconds) => {
 
 /**
  * Function to loop and check for a product coming in stock
- * TODO: store a list of added URLs to be watched, but get list of users from DB when needed
  */
 const run = async () => {
-    let found = false;
+    const timers = [];
     let error = false;
     while (true) {
         // get a list of all the websites in the db
-        await Website.find({}, (err, pages) => {
+        await Website.find({}, async (err, pages) => {
             if (err) {
                 error = true;
                 return console.error("Error retrieving entries from the database. Trying again in 10 minutes.", err);
             }
-            pages.forEach(page => {
+            // iterate through each db entry and get the page HTML
+            await pages.forEach(page => {
                 axios.get(page.url)
-                    .then(res => {
+                    .then((res) => {
+                        // load the webpage into cheerio and check if the item is in stock
                         const $ = cheerio.load(res.data);
-                        if ('Add to Cart' == $('.btn-lg').html()) {
-                            notify(page);
-                            found = true;
+                        if ('Add to Cart' === $('.btn-lg').text()) {
+                            // if the item is in and users have not already been notified
+                            if (!timers.some(entry => entry.url === page.url)) {
+                                // notify the proper users
+                                notify(page);
+                                // add url to timer so users so not get notified of the restock every 10 seconds
+                                let timer = Date.now() + 21600000;
+                                timers.push({
+                                    url: page.url,
+                                    timer: timer
+                                });
+                            }
+                        } else {
+                            console.log('no');
                         }
                     })
                     .catch(err => {
@@ -64,28 +76,38 @@ const run = async () => {
             });
         });
         if (error) {
+            // if there was a db error, wait for 10 minutes before trying again
             error = false;
             await sleep(600000);
-        } else if (!found) {
-            // if there has not been a restock, wait 10 seconds before checking again
-            await sleep(10000);
         } else {
-            // if there has been a restock wait like 6 hours or something idk
-            found = false;
-            await sleep(60000000);
+            // wait 10 seconds before checking again
+            await sleep(15000);
+        }
+        // remove any items from timers that have been in there for longer than 6 hours
+        for (let i = 0; i < timers.length; i++) {
+            if (timers[i].timer < Date.now())
+                timers.splice(i--, 1);
         }
     }
 }
 
-async function main(credentials) {
+/**
+ * Initial setup function
+ * @param credentials - Credentials retrieved from credentials.json
+ */
+async function setup(credentials) {
     // initiate connection to the Mongo database
     await connectToDB(credentials.mongoURL);
     // initialize all events to be handled by Discord.JS
     await initDiscordEvents(credentials.token)
     // start checking websites
-    run();
+    await run();
 }
 
+/**
+ * Initialize connection to the db
+ * @param {String} url - URL of db
+ */
 const connectToDB = async (url) => {
     // connect to db
     console.log('Connecting to db...');
@@ -95,10 +117,15 @@ const connectToDB = async (url) => {
         useCreateIndex: true,
         useUnifiedTopology: true
     }).then(() => {
-        console.log('Connected to db.');
+        console.log('Successfully connected to db!');
     });
 }
 
+/**
+ * Initialize Discord event handlers
+ * @param token
+ * @returns {Promise<void>}
+ */
 const initDiscordEvents = async (token) => {
     // login to discord
     await client.login(token);
@@ -121,7 +148,7 @@ const initDiscordEvents = async (token) => {
 // get Discord token from credentials.json and store in credentials object
 fs.readFile('credentials.json', (err, content) => {
     if (err) return console.error('No credentials found', err);
-    main(JSON.parse(content)).catch(e => {
+    setup(JSON.parse(content)).catch(e => {
         console.error(e);
         throw e;
     });

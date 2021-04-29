@@ -54,7 +54,7 @@ const run = async () => {
                     .then((res) => {
                         // load the webpage into cheerio and check if the item is in stock
                         const $ = cheerio.load(res.data);
-                        if ('Add to Cart' === $('.btn-lg').text()) {
+                        if ('Add to Cart' === $('.btn-lg').text() || 'Add to Cart' === $('.btn-lg').html()) {
                             // if the item is in and users have not already been notified
                             if (!timers.some(entry => entry.url === page.url)) {
                                 // notify the proper users

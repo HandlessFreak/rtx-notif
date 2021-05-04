@@ -135,7 +135,7 @@ const addPage = async (message, url) => {
  * @param {Number} num
  */
 const removePage = async (message, num) => {
-    console.log(message + " " + num);
+    console.log(message.content);
     // get a list of all websites the user is being notified of
     Website.find({"users": message.author.id}, async (err, results) => {
         if (err) {

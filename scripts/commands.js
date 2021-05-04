@@ -135,6 +135,7 @@ const addPage = async (message, url) => {
  * @param {Number} num
  */
 const removePage = async (message, num) => {
+    console.log(message + " " + num);
     // get a list of all websites the user is being notified of
     Website.find({"users": message.author.id}, async (err, results) => {
         if (err) {
@@ -144,6 +145,7 @@ const removePage = async (message, num) => {
         if (!results[num - 1])
             return message.channel.send(message.author.toString() + " Either I am not currently watching any pages for you or this is an invalid number.");
         // remove the user from the list for the website
+        console.log(results[num - 1].users + "\n" + message.author.id);
         results[num - 1].users.pop(message.author.id);
         if (results[num - 1].users.length === 0)
             // if there is no one being notified for this webpage, remove the webpage from the db

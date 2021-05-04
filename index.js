@@ -69,7 +69,7 @@ const run = async () => {
                         }
                     })
                     .catch(err => {
-                        console.error(err)
+                        console.log("Error requesting webpage: " + page);
                     });
             });
         });

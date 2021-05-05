@@ -9,5 +9,5 @@ module.exports.formattedPrint = (message, err) => {
     if (err)
         return console.error("[" + new Date().toLocaleString() + "]: " + message, err);
     else
-        return "[" + new Date().toLocaleString() + "]: " + message;
+        return console.log("[" + new Date().toLocaleString() + "]: " + message);
 }

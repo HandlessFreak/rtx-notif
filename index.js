@@ -10,14 +10,12 @@ const Discord = require('discord.js'),
     fs = require('fs'),
     mongoose = require('mongoose'),
     Website = require('./models/Website'),
-    commands = require('./scripts/commands');
-
-const members = [],
-    watchlist = [];
+    commands = require('./scripts/commands'),
+    helpers = require('./scripts/helpers');
 
 /**
  * Send a DM to everyone who wants to be notified of the in-stock product
- * @param webpage - URL of website with product that is in stock
+ * @param page
  */
 const notify = (page) => {
     page.users.forEach(async uid => {
@@ -46,7 +44,7 @@ const run = async () => {
         await Website.find({}, async (err, pages) => {
             if (err) {
                 error = true;
-                return console.error("Error retrieving entries from the database. Trying again in 10 minutes.", err);
+                return helpers.formattedPrint("Error retrieving entries from the database. Trying again in 10 minutes.", err);
             }
             // iterate through each db entry and get the page HTML
             await pages.forEach(page => {
@@ -69,7 +67,7 @@ const run = async () => {
                         }
                     })
                     .catch(err => {
-                        console.log("Error requesting webpage: " + page);
+                        helpers.formattedPrint("Error requesting webpage: " + page);
                     });
             });
         });
@@ -108,14 +106,14 @@ async function setup(credentials) {
  */
 const connectToDB = async (url) => {
     // connect to db
-    console.log('Connecting to db...');
+    helpers.formattedPrint("Connecting to db...");
     await mongoose.connect(url, {
         useNewUrlParser: true,
         useFindAndModify: false,
         useCreateIndex: true,
         useUnifiedTopology: true
     }).then(() => {
-        console.log('Successfully connected to db!');
+        helpers.formattedPrint('Successfully connected to db!');
     });
 }
 
@@ -138,14 +136,14 @@ const initDiscordEvents = async (token) => {
     });
 
     client.once('ready', () => {
-        console.log('Running...');
+        helpers.formattedPrint('Running...');
     });
 }
 
 
 // get Discord token from credentials.json and store in credentials object
 fs.readFile('credentials.json', (err, content) => {
-    if (err) return console.error('No credentials found', err);
+    if (err) return helpers.formattedPrint('No credentials found', err);
     setup(JSON.parse(content)).catch(e => {
         console.error(e);
         throw e;

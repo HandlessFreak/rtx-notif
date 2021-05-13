@@ -20,7 +20,7 @@ const Discord = require('discord.js'),
 const notify = (page) => {
     page.users.forEach(async uid => {
         const user = await client.users.fetch(uid);
-        await user.send('Your item is in stock!\n\n' + page.url);
+        await user.send('Your item is in stock!\n\n' + page.url).catch(err => helpers.formattedPrint('Error sending a message to user ' + user.toString() +': ', err));
     });
 }
 

@@ -20,7 +20,7 @@ const Discord = require('discord.js'),
 const notify = (page) => {
     page.users.forEach(async uid => {
         const user = await client.users.fetch(uid);
-        user.send('Your item is in stock!\n\n' + page.url);
+        await user.send('Your item is in stock!\n\n' + page.url);
     });
 }
 
@@ -52,9 +52,10 @@ const run = async () => {
                     .then((res) => {
                         // load the webpage into cheerio and check if the item is in stock
                         const $ = cheerio.load(res.data);
-                        if ('Add to Cart' === $('.btn-lg').text() || 'Add to Cart' === $('.btn-lg').html()) {
+                        if ('Sold Out' !== $('.btn-lg').text() || 'Sold Out' !== $('.btn-lg').html() || !$('.btn-disabled')) {
                             // if the item is in and users have not already been notified
                             if (!timers.some(entry => entry.url === page.url)) {
+                                helpers.formattedPrint('In stock: ' + page.url);
                                 // notify the proper users
                                 notify(page);
                                 // add url to timer so users so not get notified of the restock every 10 seconds
@@ -76,7 +77,7 @@ const run = async () => {
             error = false;
             await sleep(600000);
         } else {
-            // wait 10 seconds before checking again
+            // wait 15 seconds before checking again
             await sleep(15000);
         }
         // remove any items from timers that have been in there for longer than 6 hours

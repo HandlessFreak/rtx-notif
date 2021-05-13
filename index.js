@@ -68,7 +68,7 @@ const run = async () => {
                         }
                     })
                     .catch(err => {
-                        helpers.formattedPrint("Error requesting webpage: " + page);
+                        helpers.formattedPrint("Error requesting webpage: " + page.url);
                     });
             });
         });

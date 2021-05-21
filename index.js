@@ -52,7 +52,22 @@ const run = async () => {
                     .then((res) => {
                         // load the webpage into cheerio and check if the item is in stock
                         const $ = cheerio.load(res.data);
-                        if ('Sold Out' !== $('.btn-lg').text() || 'Sold Out' !== $('.btn-lg').html() || !$('.btn-disabled')) {
+                        if (page.url.includes('bestbuy.com') && !$('.btn-disabled, .btn-lg')) {
+                            // if page is a bestbuy.com link and item is in stock
+                            // if the item is in and users have not already been notified
+                            if (!timers.some(entry => entry.url === page.url)) {
+                                helpers.formattedPrint('In stock: ' + page.url);
+                                // notify the proper users
+                                notify(page);
+                                // add url to timer so users so not get notified of the restock every 10 seconds
+                                let timer = Date.now() + 21600000;
+                                timers.push({
+                                    url: page.url,
+                                    timer: timer
+                                });
+                            }
+                        } else if (page.url.includes('bestbuy.ca') && !$('.addToCartButton, .disabled_mu48L')) {
+                            // if page is a bestbuy.ca link and item is in stock
                             // if the item is in and users have not already been notified
                             if (!timers.some(entry => entry.url === page.url)) {
                                 helpers.formattedPrint('In stock: ' + page.url);

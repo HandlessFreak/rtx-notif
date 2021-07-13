@@ -53,7 +53,7 @@ const run = async () => {
                         // load the webpage into cheerio and check if the item is in stock
                         const $ = cheerio.load(res.data);
                         // TODO: Create boolean inStock function to check which website the given link is from and return if it is in stock
-                        if (page.url.includes('bestbuy.com') && !$('.btn-disabled.btn-lg').length) {
+                        if (page.url.includes('bestbuy.com') && !$('.inactive-product-message').length && !$('.btn-disabled.btn-lg').length) {
                             // TODO: Modify notify function to check if item is on a cool down and notify users if not
                             // if page is a bestbuy.com link and item is in stock
                             // if the item is in and users have not already been notified
@@ -68,7 +68,7 @@ const run = async () => {
                                     timer: timer
                                 });
                             }
-                        } else if (page.url.includes('bestbuy.ca') && !$('.addToCartButton.disabled_mu48L').length) {
+                        } else if (page.url.includes('bestbuy.ca') && !('.addToCartButton') && !$('.addToCartButton.disabled_mu48L').length) {
                             // if page is a bestbuy.ca link and item is in stock
                             // if the item is in and users have not already been notified
                             if (!timers.some(entry => entry.url === page.url)) {

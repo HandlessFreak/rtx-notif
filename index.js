@@ -62,7 +62,7 @@ const run = async () => {
                                 // notify the proper users
                                 notify(page);
                                 // add url to timer so users so not get notified of the restock every 10 seconds
-                                let timer = Date.now() + 300000;
+                                let timer = Date.now() + 21600000;
                                 timers.push({
                                     url: page.url,
                                     timer: timer
@@ -76,7 +76,7 @@ const run = async () => {
                                 // notify the proper users
                                 notify(page);
                                 // add url to timer so users so not get notified of the restock every 10 seconds
-                                let timer = Date.now() + 300000;
+                                let timer = Date.now() + 21600000;
                                 timers.push({
                                     url: page.url,
                                     timer: timer

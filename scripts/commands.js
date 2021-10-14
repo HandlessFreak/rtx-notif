@@ -1,6 +1,7 @@
 const Discord = require('discord.js'),
     mongoose = require('mongoose'),
-    Website = require('../models/Website');
+    Website = require('../models/Website'),
+    helpers = require('./helpers');
 
 /**
  * Given a message, parses the command and executes it.
@@ -63,7 +64,7 @@ const myPages = async (message) => {
     await Website.find({"users": message.author.id}, (err, results) => {
         if (err) {
             message.channel.send(message.author.toString() + " I had some trouble finding which pages I am watching for you. Either something went wrong on my end, or I am not watching any pages for you right now.");
-            return console.error("Error finding user's entries", err);
+            return helpers.formattedPrint("Error finding user's entries", err);
         }
         if (results.length === 0)
             return message.channel.send(message.author.toString() + " I am not currently watching any products for you.");
@@ -90,7 +91,7 @@ const addPage = async (message, url) => {
         // if there was an error, handle it
         if (err) {
             await message.channel.send(message.author.toString() + " Something went wrong on my end! If the issue persists, let my creator know.");
-            return console.error("Error retrieving url " + url + " from DB: ", err);
+            return helpers.formattedPrint("Error retrieving url " + url + " from DB: ", err);
         }
         // if the url is already in the db
         if (res) {
@@ -104,7 +105,7 @@ const addPage = async (message, url) => {
                 await Website.findByIdAndUpdate(res._id, res, err => {
                     if (err) {
                         message.channel.send(message.author.toString() + " I had some trouble adding you to the database. If the issue persists, let my creator know.");
-                        return console.error("Updating user in db: ", err);
+                        return helpers.formattedPrint("Updating user in db: ", err);
                     }
                 });
             }
@@ -118,7 +119,7 @@ const addPage = async (message, url) => {
             }, err => {
                 if (err) {
                     message.channel.send(message.author.toString() + " I had some trouble adding this page to my database. If the issue persists, let my creator know.");
-                    return console.error("Error creating new entry in db: ", err);
+                    return helpers.formattedPrint("Error creating new entry in db: ", err);
                 }
             });
         }
@@ -139,7 +140,7 @@ const removePage = async (message, num) => {
     Website.find({"users": message.author.id}, async (err, results) => {
         if (err) {
             await message.channel.send(message.author.toString() + " I had some trouble finding which pages I am watching for you. Either something went wrong on my end, or I am not watching any pages for you right now.");
-            return console.error("Error finding user's entries", err);
+            return helpers.formattedPrint("Error finding user's entries", err);
         }
         if (!results[num - 1])
             return message.channel.send(message.author.toString() + " Either I am not currently watching any pages for you or this is an invalid number.");
@@ -150,7 +151,7 @@ const removePage = async (message, num) => {
             await Website.findByIdAndDelete(results[num - 1]._id, err => {
                 if (err) {
                     message.channel.send(message.author.toString() + ' I had some trouble completing this request in my database. If the issue persists, let my creator know.');
-                    return console.error("Error deleting website from db: ", err);
+                    return helpers.formattedPrint("Error deleting website from db: ", err);
                 } else {
                     message.channel.send(message.author.toString() + ' You will no longer be notified of this product!');
                 }
@@ -160,7 +161,7 @@ const removePage = async (message, num) => {
             await Website.findByIdAndUpdate(results[num - 1]._id, results[num - 1], err => {
                 if (err) {
                     message.channel.send(message.author.toString() + ' I had some trouble completing this request in my database. If the issue persists, let my creator know.');
-                    return console.error("Error updating entry in db: ", err);
+                    return helpers.formattedPrint("Error updating entry in db: ", err);
                 } else {
                     message.channel.send(message.author.toString() + ' You will no longer be notified of this product!');
                 }

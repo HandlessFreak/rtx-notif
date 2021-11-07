@@ -1,6 +1,9 @@
 # RTX Lookout
 I wanted to get a 3070, but as we all know that's a bit challenging right now. I found the big notification apps like HotStock to be a bit slow, and their notifications would sometimes repeat several times, even after I asked to no longer be notified of a certain product. So I wrote a Discord bot that would DM me when they restocked. After getting my own card, I decided to expand on the idea so others would be able to use it as well.
 
+## NOTICE
+The project is currently broken. I need to fix it, but haven't had the time. I am open to any pull requests though if one of you lovely people wanted to help out.
+
 ## Quick Start
 Please note, this bot **only works with Best Buy's website**. I may end up adding support for other vendors, but for now it's only Best Buy.
 
@@ -19,4 +22,4 @@ It's a fairly simple system. If you have any questions, feel free to join my [Di
 ## Support Me
 I wrote this bot in my spare time while I should've been studying for finals. If you end up using this bot to snag yourself an RTX card, consider buying me a coffee or helping me pay for college! :)
 
-Venmo: @pb4000
+Venmo: @HandlessFreak
